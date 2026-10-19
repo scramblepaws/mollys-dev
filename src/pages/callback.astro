@@ -1,0 +1,63 @@
+---
+import { site } from "../data/site";
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>connecting to spotify…</title>
+		<style>
+			body {
+				background: #0b0716;
+				color: #e6ddff;
+				font-family: "Courier New", Courier, monospace;
+				display: grid;
+				place-items: center;
+				height: 100vh;
+			}
+		</style>
+	</head>
+	<body>
+		<p id="msg">connecting…</p>
+		<script type="application/json" id="sp-config">{JSON.stringify({ clientId: site.spotifyClientId })}</script>
+		<script>
+			const CLIENT_ID = JSON.parse(document.getElementById("sp-config").textContent).clientId;
+			const msg = document.getElementById("msg");
+
+			const code = new URLSearchParams(location.search).get("code");
+			const verifier = sessionStorage.getItem("sp_verifier");
+			const done = (text) => {
+				msg.textContent = text;
+				setTimeout(() => (location.href = "/"), 1200);
+			};
+
+			if (!code || !verifier) {
+				done("missing auth params — going home");
+			} else {
+				fetch("https://accounts.spotify.com/api/token", {
+					method: "POST",
+					headers: { "Content-Type": "application/x-www-form-urlencoded" },
+					body: new URLSearchParams({
+						grant_type: "authorization_code",
+						code,
+						redirect_uri: location.origin + "/callback",
+						client_id: CLIENT_ID,
+						code_verifier: verifier,
+					}),
+				})
+					.then((r) => r.json())
+					.then((j) => {
+						if (!j.access_token) throw new Error(j.error || "token exchange failed");
+						localStorage.setItem("sp_tok", j.access_token);
+						localStorage.setItem(
+							"sp_exp",
+							String(Date.now() + (j.expires_in - 60) * 1000)
+						);
+						if (j.refresh_token) localStorage.setItem("sp_ref", j.refresh_token);
+						done("connected!");
+					})
+					.catch((e) => done("spotify auth failed: " + e.message));
+			}
+		</script>
+	</body>
+</html>

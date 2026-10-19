@@ -1,0 +1,19 @@
+---
+import { icons } from "../data/icons";
+
+interface Props {
+	name: keyof typeof icons;
+	size?: number;
+}
+
+const { name, size = 14 } = Astro.props;
+---
+
+<svg
+	class="icon"
+	width={size}
+	height={size}
+	viewBox="0 0 24 24"
+	aria-hidden="true"
+	set:html={icons[name]}
+/>

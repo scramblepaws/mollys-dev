@@ -25,8 +25,8 @@ body {
 	background-size: 16px 16px;
 	color: var(--text);
 	font-family: "Courier New", Courier, monospace;
-	font-size: 13px;
-	line-height: 1.45;
+	font-size: 14px;
+	line-height: 1.5;
 }
 
 a {
@@ -42,8 +42,15 @@ a:hover {
 	text-decoration: underline;
 }
 
+a:focus-visible,
+.btn:focus-visible {
+	outline: 1px dotted var(--accent-bright);
+	outline-offset: 2px;
+}
+
 code {
 	font-family: inherit;
+	overflow-wrap: anywhere;
 }
 
 /* --- header --- */
@@ -120,7 +127,7 @@ code {
 }
 
 .side {
-	font-size: 11px;
+	font-size: 12px;
 }
 
 .side-group {
@@ -160,7 +167,27 @@ code {
 	word-break: break-all;
 }
 
+.side-media {
+	border: 1px solid var(--border);
+	background: var(--panel);
+	padding: 6px;
+}
+
 /* --- main content --- */
+
+.box {
+	position: relative;
+	border: 1px solid var(--border);
+	background: var(--panel);
+	padding: 14px 10px 8px;
+	margin-bottom: 14px;
+}
+
+.box > .lbl {
+	position: absolute;
+	top: -9px;
+	left: 8px;
+}
 
 .center section {
 	margin-bottom: 10px;
@@ -188,11 +215,28 @@ code {
 
 .center li {
 	margin: 3px 0;
+	overflow-wrap: anywhere;
 }
 
 .dots {
 	border-top: 1px dotted var(--border);
 	margin: 12px 0;
+}
+
+/* --- icons --- */
+
+.icon {
+	display: inline-block;
+	vertical-align: -0.15em;
+	fill: currentColor;
+	color: var(--accent-bright);
+	flex-shrink: 0;
+}
+
+.icon-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
 }
 
 /* --- tiny controls --- */
@@ -214,6 +258,27 @@ code {
 .btn:active {
 	background: var(--accent);
 	color: var(--inverted);
+}
+
+/* --- pixel art --- */
+
+.pixel-art {
+	display: grid;
+	place-items: center;
+	padding: 6px;
+}
+
+.pixel-heart {
+	width: 3px;
+	height: 3px;
+	background: var(--accent);
+	box-shadow:
+		3px 0 0 var(--accent), 6px 0 0 var(--accent), 12px 0 0 var(--accent), 15px 0 0 var(--accent),
+		0 3px 0 var(--accent), 3px 3px 0 var(--accent), 6px 3px 0 var(--accent), 9px 3px 0 var(--accent), 12px 3px 0 var(--accent), 15px 3px 0 var(--accent), 18px 3px 0 var(--accent),
+		0 6px 0 var(--accent), 3px 6px 0 var(--accent), 6px 6px 0 var(--accent), 9px 6px 0 var(--accent), 12px 6px 0 var(--accent), 15px 6px 0 var(--accent), 18px 6px 0 var(--accent),
+		3px 9px 0 var(--accent), 6px 9px 0 var(--accent), 9px 9px 0 var(--accent), 12px 9px 0 var(--accent), 15px 9px 0 var(--accent),
+		6px 12px 0 var(--accent), 9px 12px 0 var(--accent), 12px 12px 0 var(--accent),
+		9px 15px 0 var(--accent);
 }
 
 /* --- badges / widgets --- */

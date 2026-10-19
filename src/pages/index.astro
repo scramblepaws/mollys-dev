@@ -1,11 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Vinyl from "../components/Vinyl.astro";
+import Icon from "../components/Icon.astro";
 import { site } from "../data/site";
 ---
 
 <Layout title="mollys.dev">
-	<section>
+	<section class="box">
 		<div class="lbl">about / me &gt;&gt;</div>
 		<p>
 			<b>{site.name}</b> — trans woman ({site.pronouns})
@@ -14,16 +14,17 @@ import { site } from "../data/site";
 		<p>{site.blurb}</p>
 	</section>
 
-	<div class="dots"></div>
-
-	<section id="interests">
+	<section class="box" id="interests">
 		<div class="lbl">interests &gt;&gt;</div>
 		<ul>
 			<li>
 				<b>imageboards</b> — i browse{" "}
 				{site.imageboards.map((b, i) => (
 					<>
-						<a href={b.url}>{b.name}</a>
+						<a class="icon-link" href={b.url}>
+							<Icon name="arrow" size={11} />
+							{b.name}
+						</a>
 						{i < site.imageboards.length - 1 ? ", " : ""}
 					</>
 				))}
@@ -32,7 +33,10 @@ import { site } from "../data/site";
 				<b>cheat dev / jailbreaking / rooting</b> —{" "}
 				{site.cheatLinks.map((c, i) => (
 					<>
-						<a href={c.url}>{c.name}</a>
+						<a class="icon-link" href={c.url}>
+							<Icon name="arrow" size={11} />
+							{c.name}
+						</a>
 						{i < site.cheatLinks.length - 1 ? ", " : ""}
 					</>
 				))}
@@ -41,7 +45,10 @@ import { site } from "../data/site";
 				<b>rhythm games</b> —{" "}
 				{site.rhythmGames.map((g, i) => (
 					<>
-						<a href={g.profile}>{g.name}</a>
+						<a class="icon-link" href={g.profile}>
+							<Icon name="arrow" size={11} />
+							{g.name}
+						</a>
 						{i < site.rhythmGames.length - 1 ? ", " : ""}
 					</>
 				))}
@@ -50,39 +57,34 @@ import { site } from "../data/site";
 		</ul>
 	</section>
 
-	<div class="dots"></div>
-
-	<section id="visualizer">
-		<div class="lbl">media player &gt;&gt;</div>
-		<Vinyl />
-	</section>
-
-	<div class="dots"></div>
-
-	<section id="steam">
+	<section class="box" id="steam">
 		<div class="lbl">steam &gt;&gt;</div>
 		<ul>
-			{site.steam.map((s) => (
+			{site.steam.map((s, i) => (
 				<li>
-					<a href={s}>{s}</a>
+					<a class="icon-link" href={s}>
+						<Icon name="steam" size={13} />
+						{s}
+					</a>
 				</li>
 			))}
 		</ul>
 	</section>
 
-	<div class="dots"></div>
-
-	<section id="contact">
+	<section class="box" id="contact">
 		<div class="lbl">contact &gt;&gt;</div>
 		<ul>
 			<li>
-				<b>discord</b>: <code>{site.contact.discord}</code>
+				<Icon name="discord" size={13} /> <b>discord</b>:{" "}
+				<code>{site.contact.discord}</code>
 			</li>
 			<li>
-				<b>telegram</b>: <code>{site.contact.telegram}</code>
+				<Icon name="telegram" size={13} /> <b>telegram</b>:{" "}
+				<code>{site.contact.telegram}</code>
 			</li>
 			<li>
-				<b>session</b>: <code>{site.contact.session}</code>
+				<Icon name="session" size={13} /> <b>session</b>:{" "}
+				<code>{site.contact.session}</code>
 				<button class="btn" data-copy={site.contact.session}>[ copy ]</button>
 			</li>
 		</ul>

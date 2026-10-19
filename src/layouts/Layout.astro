@@ -1,6 +1,8 @@
 ---
 import "../styles/global.css";
 import { marqueeText, site } from "../data/site";
+import Icon from "../components/Icon.astro";
+import Vinyl from "../components/Vinyl.astro";
 
 interface Props {
 	title: string;
@@ -43,7 +45,6 @@ const year = new Date().getFullYear();
 					<ul>
 						<li>[ <a href="/">home</a> ]</li>
 						<li>[ <a href="/blog/">blog</a> ]</li>
-						<li>[ <a href="/#visualizer">media player</a> ]</li>
 						<li>[ <a href="/#contact">contact</a> ]</li>
 					</ul>
 				</div>
@@ -51,9 +52,12 @@ const year = new Date().getFullYear();
 					<div class="side-title">links</div>
 					<ul>
 						{
-							site.steam.map((s) => (
+							site.steam.map((s, i) => (
 								<li>
-									<a href={s}>{s}</a>
+									<a class="icon-link" href={s} title={s}>
+										<Icon name="steam" size={13} />
+										steam {i + 1}
+									</a>
 								</li>
 							))
 						}
@@ -87,8 +91,20 @@ const year = new Date().getFullYear();
 					</p>
 				</div>
 				<div class="side-group">
+					<div class="side-title">media player</div>
+					<div class="side-media">
+						<Vinyl />
+					</div>
+				</div>
+				<div class="side-group">
 					<div class="side-title">updates</div>
 					<p><span class="blink">■</span> under construction</p>
+				</div>
+				<div class="side-group">
+					<div class="side-title">art</div>
+					<div class="pixel-art">
+						<div class="pixel-heart" aria-hidden="true"></div>
+					</div>
 				</div>
 			</aside>
 		</div>

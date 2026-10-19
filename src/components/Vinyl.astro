@@ -1,39 +1,243 @@
 ---
+import { site } from "../data/site";
 ---
 
-<div class="vinyl-wrap">
+<div class="player" id="player">
 	<div class="vinyl" id="vinyl">
 		<div class="label"><span>mollys.dev</span></div>
 		<div class="hole"></div>
 	</div>
-	<div class="np">
-		<button class="btn" data-act="play">[ play ]</button>
-		<button class="btn" data-act="stop">[ stop ]</button>
-		<span>now playing: <span class="blink">nothing</span> (decorative)</span>
+	<div class="track-info">
+		<div class="track-title" id="track-title">not connected</div>
+		<div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
+		<div class="times"><span id="time-cur">0:00</span><span id="time-dur">0:00</span></div>
+		<div class="controls">
+			<button class="btn" id="btn-connect" hidden>[ connect ]</button>
+			<button class="btn" id="btn-play">[ play ]</button>
+			<button class="btn" id="btn-stop">[ stop ]</button>
+			<button class="btn" id="btn-next">[ next ]</button>
+		</div>
 	</div>
 </div>
 
+<script src="https://sdk.scdn.co/spotify-player.js"></script>
+
+<script type="application/json" id="sp-config">{JSON.stringify({ clientId: site.spotifyClientId, playlistId: site.spotifyPlaylistId })}</script>
+
 <script>
-	const v = document.getElementById("vinyl");
-	document.querySelectorAll("[data-act]").forEach((b) => {
-		b.addEventListener("click", () => {
-			v.style.animationPlayState = b.dataset.act === "play" ? "running" : "paused";
+	const spConfig = JSON.parse(document.getElementById("sp-config").textContent);
+	const CLIENT_ID = spConfig.clientId;
+	const PLAYLIST_ID = spConfig.playlistId;
+	const REDIRECT = location.origin + "/callback";
+
+	const vinyl = document.getElementById("vinyl");
+	const titleEl = document.getElementById("track-title");
+	const fill = document.getElementById("progress-fill");
+	const timeCur = document.getElementById("time-cur");
+	const timeDur = document.getElementById("time-dur");
+	const btnPlay = document.getElementById("btn-play");
+	const btnConnect = document.getElementById("btn-connect");
+
+	let player = null;
+	let deviceId = null;
+	let state = null;
+	let ticker = null;
+
+	const fmt = (s) => {
+		s = Math.floor(s || 0);
+		return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+	};
+
+	const setSpin = (on) => {
+		vinyl.style.animationPlayState = on ? "running" : "paused";
+	};
+
+	const setTitle = (t) => {
+		titleEl.textContent = t;
+	};
+
+	const renderState = () => {
+		if (!state) return;
+		const t = state.track_window.current_track;
+		setTitle(t.name + " — " + t.artists.map((a) => a.name).join(", "));
+		timeDur.textContent = fmt(state.duration / 1000);
+		setSpin(!state.paused);
+		btnPlay.textContent = state.paused ? "[ play ]" : "[ pause ]";
+	};
+
+	const startTicker = () => {
+		clearInterval(ticker);
+		ticker = setInterval(() => {
+			if (!state || state.paused) return;
+			const pos = state.position + (Date.now() - state.timestamp);
+			fill.style.width = Math.min(100, (pos / state.duration) * 100) + "%";
+			timeCur.textContent = fmt(pos / 1000);
+		}, 500);
+	};
+
+	const playPlaylist = async () => {
+		const token = localStorage.getItem("sp_tok");
+		if (!deviceId || !token) return;
+		try {
+			await fetch("https://api.spotify.com/v1/me/player/play", {
+				method: "PUT",
+				headers: {
+					Authorization: "Bearer " + token,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					context_uri: "spotify:playlist:" + PLAYLIST_ID,
+					offset: { position: 0 },
+				}),
+			});
+		} catch {}
+	};
+
+	const refreshToken = async () => {
+		const ref = localStorage.getItem("sp_ref");
+		if (!ref) return null;
+		const r = await fetch("https://accounts.spotify.com/api/token", {
+			method: "POST",
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			body: new URLSearchParams({
+				grant_type: "refresh_token",
+				refresh_token: ref,
+				client_id: CLIENT_ID,
+			}),
 		});
+		const j = await r.json();
+		if (!j.access_token) return null;
+		localStorage.setItem("sp_tok", j.access_token);
+		localStorage.setItem("sp_exp", String(Date.now() + (j.expires_in - 60) * 1000));
+		if (j.refresh_token) localStorage.setItem("sp_ref", j.refresh_token);
+		return j.access_token;
+	};
+
+	const getToken = async () => {
+		const tok = localStorage.getItem("sp_tok");
+		const exp = parseInt(localStorage.getItem("sp_exp") || "0", 10);
+		if (tok && Date.now() < exp) return tok;
+		return refreshToken();
+	};
+
+	const initPlayer = () => {
+		player = new Spotify.Player({
+			name: "mollys.dev",
+			getOAuthToken: (cb) => {
+				getToken().then((t) => cb(t || ""));
+			},
+			volume: 0.5,
+		});
+
+		player.addListener("ready", ({ device_id }) => {
+			deviceId = device_id;
+			btnConnect.hidden = true;
+			setTitle("connected — press [ play ]");
+			playPlaylist();
+		});
+
+		player.addListener("not_ready", ({ device_id }) => {
+			deviceId = null;
+		});
+
+		player.addListener("player_state_changed", (s) => {
+			state = s;
+			renderState();
+			startTicker();
+		});
+
+		player.addListener("account_error", () => setTitle("spotify premium required :("));
+		player.addListener("authentication_error", () => {
+			setTitle("spotify login expired — reconnect");
+			btnConnect.hidden = false;
+		});
+		player.addListener("playback_error", () => setTitle("playback error :("));
+
+		player.connect().then((ok) => {
+			if (!ok) {
+				setTitle("spotify wouldn't connect :(");
+				btnConnect.hidden = false;
+			}
+		});
+	};
+
+	btnConnect.addEventListener("click", async () => {
+		const verifier = crypto.randomUUID() + crypto.randomUUID();
+		const digest = await crypto.subtle.digest(
+			"SHA-256",
+			new TextEncoder().encode(verifier)
+		);
+		const challenge = btoa(String.fromCharCode(...new Uint8Array(digest)))
+			.replace(/\+/g, "-")
+			.replace(/\//g, "_")
+			.replace(/=+$/, "");
+		sessionStorage.setItem("sp_verifier", verifier);
+
+		const params = new URLSearchParams({
+			client_id: CLIENT_ID,
+			response_type: "code",
+			redirect_uri: REDIRECT,
+			scope:
+				"streaming user-read-email user-read-private user-modify-playback-state user-read-playback-state playlist-read-private playlist-read-collaborative",
+			code_challenge_method: "S256",
+			code_challenge: challenge,
+			state: "molly",
+		});
+		location.href = "https://accounts.spotify.com/authorize?" + params;
 	});
+
+	btnPlay.addEventListener("click", () => {
+		if (!player) return;
+		if (!state) {
+			playPlaylist();
+			return;
+		}
+		player.togglePlay();
+	});
+
+	document.getElementById("btn-stop").addEventListener("click", () => {
+		if (!player || !state) return;
+		player.pause().then(() => player.seek(0));
+		fill.style.width = "0%";
+		timeCur.textContent = "0:00";
+	});
+
+	document.getElementById("btn-next").addEventListener("click", () => {
+		if (!player) return;
+		if (!state) {
+			playPlaylist();
+			return;
+		}
+		player.nextTrack();
+	});
+
+	if (CLIENT_ID && !CLIENT_ID.startsWith("PASTE_")) {
+		if (localStorage.getItem("sp_tok")) {
+			btnConnect.hidden = true;
+			window.onSpotifyWebPlaybackSDKReady = initPlayer;
+		} else {
+			btnConnect.hidden = false;
+			setTitle("press [ connect ] to log into spotify");
+		}
+	} else {
+		setTitle("spotify client id missing");
+	}
 </script>
 
 <style>
-	.vinyl-wrap {
-		display: grid;
-		place-items: center;
-		padding: 6px 0 2px;
+	.player {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+		padding: 2px 0;
 	}
 
 	.vinyl {
 		position: relative;
 		display: grid;
 		place-items: center;
-		width: 150px;
+		width: 100px;
 		aspect-ratio: 1;
 		border-radius: 50%;
 		background:
@@ -42,9 +246,6 @@
 		border: 1px solid #000;
 		box-shadow: 0 0 10px rgba(183, 148, 246, 0.3);
 		animation: spin 6s linear infinite;
-	}
-
-	.vinyl:hover {
 		animation-play-state: paused;
 	}
 
@@ -61,7 +262,7 @@
 	}
 
 	.label span {
-		font: bold 8px "Courier New", Courier, monospace;
+		font: bold 7px "Courier New", Courier, monospace;
 		color: var(--inverted, #140b2e);
 		letter-spacing: 1px;
 	}
@@ -76,13 +277,41 @@
 		background: var(--bg, #0b0716);
 	}
 
-	.np {
+	.track-info {
+		width: 100%;
+	}
+
+	.track-title {
+		font-size: 10px;
+		margin-bottom: 4px;
+		text-align: center;
+	}
+
+	.progress {
+		width: 100%;
+		height: 8px;
+		border: 1px solid var(--border, #6d4fb5);
+		background: var(--bg, #0b0716);
+	}
+
+	.progress-fill {
+		height: 100%;
+		width: 0%;
+		background: var(--accent-dark, #5b3d99);
+	}
+
+	.times {
 		display: flex;
-		align-items: center;
-		gap: 6px;
-		margin-top: 8px;
-		font-size: 11px;
+		justify-content: space-between;
+		font-size: 9px;
 		color: var(--dim, #a896c9);
+		margin: 2px 0 4px;
+	}
+
+	.controls {
+		display: flex;
+		gap: 6px;
+		justify-content: center;
 	}
 
 	@keyframes spin {

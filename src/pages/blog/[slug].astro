@@ -12,7 +12,7 @@ const { Content } = await render(post);
 ---
 
 <Layout title={`${post.data.title} — mollys.dev`}>
-	<article>
+	<article class="box">
 		<div class="lbl">{post.data.title}</div>
 		<p class="post-date">posted {post.data.date.toISOString().slice(0, 10)}</p>
 		<div class="dots"></div>
