@@ -1,0 +1,109 @@
+---
+import "../styles/global.css";
+import { marqueeText, site } from "../data/site";
+
+interface Props {
+	title: string;
+}
+
+const { title } = Astro.props;
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<title>{title}</title>
+	</head>
+	<body>
+		<header class="top">
+			<div class="brand">
+				<span class="logo">mollys.dev</span>
+				<span class="hello">hello world_<span class="cur blink">█</span></span>
+			</div>
+			<div class="mini-nav">
+				[ <a href="/blog/">prev</a> ] [ <a href="/#contact">next</a> ]
+			</div>
+			<div class="announce" aria-hidden="true">
+				<div class="announce-inner">
+					<span>{marqueeText}</span><span>{marqueeText}</span>
+				</div>
+			</div>
+		</header>
+
+		<div class="cols">
+			<aside class="side side-left">
+				<div class="side-group">
+					<div class="side-title">nav</div>
+					<ul>
+						<li>[ <a href="/">home</a> ]</li>
+						<li>[ <a href="/blog/">blog</a> ]</li>
+						<li>[ <a href="/#visualizer">media player</a> ]</li>
+						<li>[ <a href="/#contact">contact</a> ]</li>
+					</ul>
+				</div>
+				<div class="side-group">
+					<div class="side-title">links</div>
+					<ul>
+						{
+							site.steam.map((s) => (
+								<li>
+									<a href={s}>{s}</a>
+								</li>
+							))
+						}
+					</ul>
+				</div>
+				<div class="side-group">
+					<div class="side-title">site info</div>
+					<p>
+						made by molly<br />
+						© {year} mollys.dev
+					</p>
+				</div>
+			</aside>
+
+			<main class="center">
+				<slot />
+			</main>
+
+			<aside class="side side-right">
+				<div class="side-group">
+					<div class="side-title">stats</div>
+					<p>visitor no. <span class="counter">0000000</span></p>
+				</div>
+				<div class="side-group">
+					<div class="side-title">badges</div>
+					<p>
+						<span class="badge">best viewed 800x600</span>
+						<span class="badge">optimized for netscape</span>
+						<span class="badge">trans rights</span>
+						<span class="badge">pro-DIY hrt</span>
+					</p>
+				</div>
+				<div class="side-group">
+					<div class="side-title">updates</div>
+					<p><span class="blink">■</span> under construction</p>
+				</div>
+			</aside>
+		</div>
+
+		<footer class="site-foot">
+			<div class="dots"></div>
+			<p>this page is handmade. no frameworks were harmed. (ok, one framework)</p>
+		</footer>
+
+		<script>
+			const n = (parseInt(localStorage.getItem("visits") || "0", 10) + 1).toString();
+			localStorage.setItem("visits", n);
+			document.querySelectorAll(".counter").forEach((el) => {
+				el.textContent = (42000 + parseInt(n, 10)).toString().padStart(7, "0");
+			});
+		</script>
+	</body>
+</html>

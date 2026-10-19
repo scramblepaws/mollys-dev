@@ -1,0 +1,100 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Vinyl from "../components/Vinyl.astro";
+import { site } from "../data/site";
+---
+
+<Layout title="mollys.dev">
+	<section>
+		<div class="lbl">about / me &gt;&gt;</div>
+		<p>
+			<b>{site.name}</b> — trans woman ({site.pronouns})
+		</p>
+		<p>{site.tagline}</p>
+		<p>{site.blurb}</p>
+	</section>
+
+	<div class="dots"></div>
+
+	<section id="interests">
+		<div class="lbl">interests &gt;&gt;</div>
+		<ul>
+			<li>
+				<b>imageboards</b> — i browse{" "}
+				{site.imageboards.map((b, i) => (
+					<>
+						<a href={b.url}>{b.name}</a>
+						{i < site.imageboards.length - 1 ? ", " : ""}
+					</>
+				))}
+			</li>
+			<li>
+				<b>cheat dev / jailbreaking / rooting</b> —{" "}
+				{site.cheatLinks.map((c, i) => (
+					<>
+						<a href={c.url}>{c.name}</a>
+						{i < site.cheatLinks.length - 1 ? ", " : ""}
+					</>
+				))}
+			</li>
+			<li>
+				<b>rhythm games</b> —{" "}
+				{site.rhythmGames.map((g, i) => (
+					<>
+						<a href={g.profile}>{g.name}</a>
+						{i < site.rhythmGames.length - 1 ? ", " : ""}
+					</>
+				))}
+			</li>
+			<li>{site.diyHrt}</li>
+		</ul>
+	</section>
+
+	<div class="dots"></div>
+
+	<section id="visualizer">
+		<div class="lbl">media player &gt;&gt;</div>
+		<Vinyl />
+	</section>
+
+	<div class="dots"></div>
+
+	<section id="steam">
+		<div class="lbl">steam &gt;&gt;</div>
+		<ul>
+			{site.steam.map((s) => (
+				<li>
+					<a href={s}>{s}</a>
+				</li>
+			))}
+		</ul>
+	</section>
+
+	<div class="dots"></div>
+
+	<section id="contact">
+		<div class="lbl">contact &gt;&gt;</div>
+		<ul>
+			<li>
+				<b>discord</b>: <code>{site.contact.discord}</code>
+			</li>
+			<li>
+				<b>telegram</b>: <code>{site.contact.telegram}</code>
+			</li>
+			<li>
+				<b>session</b>: <code>{site.contact.session}</code>
+				<button class="btn" data-copy={site.contact.session}>[ copy ]</button>
+			</li>
+		</ul>
+	</section>
+</Layout>
+
+<script>
+	document.querySelectorAll("[data-copy]").forEach((btn) => {
+		btn.addEventListener("click", async () => {
+			await navigator.clipboard.writeText(btn.dataset.copy);
+			btn.textContent = "[ copied ]";
+			setTimeout(() => (btn.textContent = "[ copy ]"), 1500);
+		});
+	});
+</script>

@@ -1,0 +1,309 @@
+:root {
+	--bg: #0b0716;
+	--panel: #141022;
+	--text: #e6ddff;
+	--dim: #a896c9;
+	--accent: #b794f6;
+	--accent-bright: #d6bcff;
+	--accent-dark: #5b3d99;
+	--border: #6d4fb5;
+	--inverted: #140b2e;
+	--link: #d6bcff;
+	--visited: #9f7fd6;
+	--green: #6ee7a0;
+}
+
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	background-color: var(--bg);
+	background-image: radial-gradient(circle, rgba(183, 148, 246, 0.08) 1px, transparent 1px);
+	background-size: 16px 16px;
+	color: var(--text);
+	font-family: "Courier New", Courier, monospace;
+	font-size: 13px;
+	line-height: 1.45;
+}
+
+a {
+	color: var(--link);
+	text-decoration: none;
+}
+
+a:visited {
+	color: var(--visited);
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+code {
+	font-family: inherit;
+}
+
+/* --- header --- */
+
+.top {
+	text-align: center;
+	padding: 14px 8px 0;
+}
+
+.brand {
+	display: inline-block;
+	text-align: left;
+}
+
+.logo {
+	display: block;
+	font-size: 30px;
+	font-weight: bold;
+	letter-spacing: 3px;
+	color: var(--accent-bright);
+}
+
+.hello {
+	display: block;
+	font-size: 12px;
+	color: var(--dim);
+	margin-top: 2px;
+}
+
+.cur {
+	color: var(--accent);
+}
+
+.mini-nav {
+	margin: 4px 0 10px;
+	font-size: 12px;
+}
+
+.announce {
+	overflow: hidden;
+	background: var(--accent);
+	color: var(--inverted);
+	max-width: 980px;
+	margin: 0 auto;
+	padding: 2px 0;
+}
+
+.announce-inner {
+	display: flex;
+	width: max-content;
+	animation: marquee 25s linear infinite;
+}
+
+.announce-inner span {
+	white-space: pre;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+@keyframes marquee {
+	to {
+		transform: translateX(-50%);
+	}
+}
+
+/* --- three columns --- */
+
+.cols {
+	display: grid;
+	grid-template-columns: 170px minmax(0, 620px) 170px;
+	gap: 16px;
+	justify-content: center;
+	padding: 14px 8px 0;
+}
+
+.side {
+	font-size: 11px;
+}
+
+.side-group {
+	margin-bottom: 14px;
+}
+
+.side-title {
+	display: inline-block;
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-bottom: 0;
+	color: var(--dim);
+	padding: 0 5px;
+	font-size: 10px;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+}
+
+.side-group ul {
+	list-style: none;
+	border: 1px solid var(--border);
+	padding: 4px 6px;
+}
+
+.side-group p {
+	border: 1px solid var(--border);
+	border-top: 0;
+	padding: 4px 6px;
+}
+
+.side-group ul + p {
+	border-top: 0;
+}
+
+.side-group a {
+	display: inline-block;
+	word-break: break-all;
+}
+
+/* --- main content --- */
+
+.center section {
+	margin-bottom: 10px;
+}
+
+.lbl {
+	display: inline-block;
+	background: var(--accent);
+	color: var(--inverted);
+	font-weight: bold;
+	font-size: 12px;
+	letter-spacing: 1px;
+	padding: 1px 7px;
+}
+
+.center p {
+	margin: 6px 0;
+}
+
+.center ul {
+	list-style: square;
+	padding-left: 22px;
+	margin: 4px 0;
+}
+
+.center li {
+	margin: 3px 0;
+}
+
+.dots {
+	border-top: 1px dotted var(--border);
+	margin: 12px 0;
+}
+
+/* --- tiny controls --- */
+
+.btn {
+	background: var(--panel);
+	color: var(--text);
+	border: 1px solid var(--border);
+	font: 11px "Courier New", Courier, monospace;
+	padding: 0 5px;
+	cursor: pointer;
+}
+
+.btn:hover {
+	background: var(--accent-dark);
+	color: var(--accent-bright);
+}
+
+.btn:active {
+	background: var(--accent);
+	color: var(--inverted);
+}
+
+/* --- badges / widgets --- */
+
+.badge {
+	display: inline-block;
+	border: 1px solid var(--border);
+	padding: 1px 5px;
+	margin: 1px 0;
+	font-size: 10px;
+	color: var(--accent-bright);
+}
+
+.counter {
+	display: inline-block;
+	background: #05030c;
+	border: 1px solid var(--border);
+	color: var(--accent-bright);
+	padding: 0 4px;
+	letter-spacing: 2px;
+}
+
+.blink {
+	animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+	50% {
+		opacity: 0;
+	}
+}
+
+/* --- footer --- */
+
+.site-foot {
+	text-align: center;
+	font-size: 11px;
+	color: var(--dim);
+	padding: 16px 8px 24px;
+}
+
+/* --- blog --- */
+
+.post-list {
+	list-style: none;
+	padding: 0;
+}
+
+.post-list li {
+	border-bottom: 1px dotted var(--border);
+	padding: 6px 0;
+}
+
+.post-date {
+	color: var(--dim);
+	font-size: 11px;
+}
+
+.post-body p {
+	margin: 8px 0;
+}
+
+.post-body pre {
+	background: #05030c;
+	border: 1px solid var(--border);
+	padding: 8px;
+	overflow-x: auto;
+}
+
+.post-body img {
+	max-width: 100%;
+	border: 1px solid var(--border);
+}
+
+/* --- responsive --- */
+
+@media (max-width: 900px) {
+	.cols {
+		grid-template-columns: 1fr;
+	}
+
+	.side-left {
+		order: 2;
+	}
+
+	.center {
+		order: 1;
+	}
+
+	.side-right {
+		order: 3;
+	}
+}

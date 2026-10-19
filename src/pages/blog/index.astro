@@ -1,0 +1,29 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog")).sort(
+	(a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+---
+
+<Layout title="blog — mollys.dev">
+	<section>
+		<div class="lbl">blog &gt;&gt;</div>
+		{
+			posts.length > 0 ? (
+				<ul class="post-list">
+					{posts.map((post) => (
+						<li>
+							<a href={`/blog/${post.id}/`}>{post.data.title}</a>{" "}
+							<span class="post-date">{post.data.date.toISOString().slice(0, 10)}</span>
+							{post.data.description && <p>{post.data.description}</p>}
+						</li>
+					))}
+				</ul>
+			) : (
+				<p>no posts yet. check back soon <span class="blink">_</span></p>
+			)
+		}
+	</section>
+</Layout>
