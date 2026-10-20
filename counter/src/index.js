@@ -1,3 +1,6 @@
+// isolate-level cache: survives across requests that share the same worker instance
+let memCache = new Map();
+
 export default {
 	async fetch(req, env) {
 		const url = new URL(req.url);
@@ -59,8 +62,13 @@ export default {
 				return Response.json({ error: "bad url" }, { status: 400, headers: cors });
 			}
 			const key = "pv:" + target.slice(0, 200);
+			const mem = memCache.get(key);
+			if (mem && Date.now() - mem.ts < 600000) {
+				return new Response(mem.data, { headers: { ...cors, "Content-Type": "application/json" } });
+			}
 			const cached = await env.COUNTS.get(key);
 			if (cached) {
+				memCache.set(key, { data: cached, ts: Date.now() });
 				return new Response(cached, { headers: { ...cors, "Content-Type": "application/json" } });
 			}
 			try {
@@ -77,8 +85,25 @@ export default {
 				clearTimeout(t);
 				const ct = res.headers.get("content-type") || "";
 				if (!res.ok || !ct.includes("html")) throw new Error("not html");
-				const buf = await res.arrayBuffer();
-				const html = new TextDecoder().decode(buf).slice(0, 300000);
+
+				// stream only the first 256KB instead of the whole page
+				const reader = res.body.getReader();
+				const chunks = [];
+				let total = 0;
+				while (total < 256000) {
+					const { done, value } = await reader.read();
+					if (done) break;
+					chunks.push(value);
+					total += value.byteLength;
+				}
+				reader.cancel().catch(() => {});
+				const buf = new Uint8Array(total);
+				let off = 0;
+				for (const c of chunks) {
+					buf.set(c, off);
+					off += c.byteLength;
+				}
+				const html = new TextDecoder().decode(buf.subarray(0, 256000));
 				const meta = (attr) => {
 					const m =
 						html.match(new RegExp('<meta[^>]+(?:property|name)=["\']' + attr + '["\'][^>]*content=["\']([^"\']+)', "i")) ||
@@ -96,6 +121,7 @@ export default {
 					url: target,
 				});
 				await env.COUNTS.put(key, data, { expirationTtl: 86400 });
+				memCache.set(key, { data, ts: Date.now() });
 				return new Response(data, { headers: { ...cors, "Content-Type": "application/json" } });
 			} catch (e) {
 				return Response.json({ error: String((e && e.message) || e) }, { status: 502, headers: cors });
