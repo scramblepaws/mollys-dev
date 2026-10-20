@@ -10,9 +10,9 @@ export const site = {
 	diyHrt:
 		"pro-DIY HRT: hormones for everyone who wants them. do your research, get your levels tested, stay safe.",
 	contact: {
-		discord: "your_discord_handle",
-		telegram: "@your_telegram_handle",
-		session: "05_your_session_id_here_0000000000000000000000000000",
+		discord: "mollysfo",
+		telegram: "https://t.me/MollyTech",
+		session: "051eebcd9e7c52852d5761bfaf2de10ff78351c08da41e6767b060d383bebd5851",
 	},
 	steam: [
 		"https://steamcommunity.com/id/cilahns/",

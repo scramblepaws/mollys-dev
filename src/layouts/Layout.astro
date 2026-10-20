@@ -45,6 +45,22 @@ const year = new Date().getFullYear();
 					</ul>
 				</div>
 				<div class="side-group">
+					<div class="side-title">socials</div>
+					<ul>
+						<li>
+							<Icon name="discord" size={12} /> {site.contact.discord}
+						</li>
+						<li>
+							<Icon name="telegram" size={12} />{" "}
+							<a href={site.contact.telegram}>t.me/MollyTech</a>
+						</li>
+						<li>
+							<Icon name="session" size={12} />{" "}
+							<button class="btn side-copy" data-copy={site.contact.session}>[ copy id ]</button>
+						</li>
+					</ul>
+				</div>
+				<div class="side-group">
 					<div class="side-title">links</div>
 					<ul>
 						{
@@ -120,6 +136,15 @@ const year = new Date().getFullYear();
 		</footer>
 
 		<script>
+			document.querySelectorAll("[data-copy]").forEach((btn) => {
+				btn.addEventListener("click", async () => {
+					await navigator.clipboard.writeText(btn.dataset.copy);
+					const original = btn.textContent;
+					btn.textContent = "[ copied ]";
+					setTimeout(() => (btn.textContent = original), 1500);
+				});
+			});
+
 			const PREVIEW_API = "https://molly-counter.femfus.workers.dev/preview?url=";
 			const cache = new Map();
 			let tip = null;

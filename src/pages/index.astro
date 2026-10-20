@@ -78,7 +78,7 @@ import { site } from "../data/site";
 			</li>
 			<li>
 				<Icon name="telegram" size={13} /> <b>telegram</b>:{" "}
-				<code>{site.contact.telegram}</code>
+				<a href={site.contact.telegram}>{site.contact.telegram}</a>
 			</li>
 			<li>
 				<Icon name="session" size={13} /> <b>session</b>:{" "}
@@ -167,14 +167,4 @@ import { site } from "../data/site";
 	});
 
 	load();
-</script>
-
-<script>
-	document.querySelectorAll("[data-copy]").forEach((btn) => {
-		btn.addEventListener("click", async () => {
-			await navigator.clipboard.writeText(btn.dataset.copy);
-			btn.textContent = "[ copied ]";
-			setTimeout(() => (btn.textContent = "[ copy ]"), 1500);
-		});
-	});
 </script>
