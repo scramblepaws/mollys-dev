@@ -53,6 +53,55 @@ export default {
 			return Response.json({ ok: true, entry }, { headers: cors });
 		}
 
+		if (req.method === "GET" && url.pathname === "/preview") {
+			const target = url.searchParams.get("url");
+			if (!target || !/^https?:\/\//i.test(target)) {
+				return Response.json({ error: "bad url" }, { status: 400, headers: cors });
+			}
+			const key = "pv:" + target.slice(0, 200);
+			const cached = await env.COUNTS.get(key);
+			if (cached) {
+				return new Response(cached, { headers: { ...cors, "Content-Type": "application/json" } });
+			}
+			try {
+				const ctrl = new AbortController();
+				const t = setTimeout(() => ctrl.abort(), 6000);
+				const res = await fetch(target, {
+					signal: ctrl.signal,
+					headers: {
+						"User-Agent": "Mozilla/5.0 (compatible; mollys.dev link preview)",
+						Accept: "text/html",
+					},
+					redirect: "follow",
+				});
+				clearTimeout(t);
+				const ct = res.headers.get("content-type") || "";
+				if (!res.ok || !ct.includes("html")) throw new Error("not html");
+				const buf = await res.arrayBuffer();
+				const html = new TextDecoder().decode(buf).slice(0, 300000);
+				const meta = (attr) => {
+					const m =
+						html.match(new RegExp('<meta[^>]+(?:property|name)=["\']' + attr + '["\'][^>]*content=["\']([^"\']+)', "i")) ||
+						html.match(new RegExp('<meta[^>]+content=["\']([^"\']+)["\'][^>]*(?:property|name)=["\']' + attr, "i"));
+					return m ? m[1] : null;
+				};
+				const decode = (s) =>
+					s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'");
+				const titleTag = html.match(/<title[^>]*>([^<]+)</i);
+				const title = meta("og:title") || (titleTag ? titleTag[1] : "") || target;
+				const data = JSON.stringify({
+					title: decode(title).trim().slice(0, 140),
+					image: meta("og:image"),
+					desc: decode(meta("og:description") || "").slice(0, 200),
+					url: target,
+				});
+				await env.COUNTS.put(key, data, { expirationTtl: 86400 });
+				return new Response(data, { headers: { ...cors, "Content-Type": "application/json" } });
+			} catch (e) {
+				return Response.json({ error: String((e && e.message) || e) }, { status: 502, headers: cors });
+			}
+		}
+
 		return new Response("not found", { status: 404, headers: cors });
 	},
 };

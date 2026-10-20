@@ -32,6 +32,7 @@ body {
 a {
 	color: var(--link);
 	text-decoration: none;
+	font-weight: bold;
 }
 
 a:visited {
@@ -427,6 +428,46 @@ code {
 .post-body img {
 	max-width: 100%;
 	border: 1px solid var(--border);
+}
+
+/* --- link preview --- */
+
+#link-preview {
+	position: fixed;
+	z-index: 9999;
+	width: 260px;
+	background: var(--panel);
+	border: 1px solid var(--border);
+	padding: 6px;
+	pointer-events: none;
+	box-shadow: 3px 3px 0 rgba(183, 148, 246, 0.2);
+}
+
+#link-preview img {
+	display: block;
+	max-width: 100%;
+	max-height: 110px;
+	margin: 0 auto 4px;
+	border: 1px dotted var(--border);
+}
+
+#link-preview .lp-title {
+	font-size: 11px;
+	font-weight: bold;
+	color: var(--accent-bright);
+	margin-bottom: 2px;
+}
+
+#link-preview .lp-desc {
+	font-size: 10px;
+	color: var(--text);
+	margin-bottom: 2px;
+}
+
+#link-preview .lp-host {
+	font-size: 9px;
+	color: var(--dim);
+	letter-spacing: 1px;
 }
 
 /* --- decorative --- */

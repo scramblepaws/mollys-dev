@@ -119,5 +119,88 @@ const year = new Date().getFullYear();
 			<div class="dots"></div>
 			<p>this page is handmade. no frameworks were harmed. (ok, one framework)</p>
 		</footer>
+
+		<script>
+			const PREVIEW_API = "https://molly-counter.femfus.workers.dev/preview?url=";
+			const cache = new Map();
+			let tip = null;
+			let timer = null;
+			let active = null;
+
+			const makeTip = () => {
+				tip = document.createElement("div");
+				tip.id = "link-preview";
+				tip.style.display = "none";
+				document.body.appendChild(tip);
+			};
+
+			const hide = () => {
+				if (timer) clearTimeout(timer);
+				timer = null;
+				active = null;
+				if (tip) tip.style.display = "none";
+			};
+
+			const show = (a, d) => {
+				tip.replaceChildren();
+				if (d.image) {
+					const img = document.createElement("img");
+					img.src = d.image;
+					img.referrerPolicy = "no-referrer";
+					img.onerror = () => img.remove();
+					tip.appendChild(img);
+				}
+				const t = document.createElement("div");
+				t.className = "lp-title";
+				t.textContent = d.title;
+				tip.appendChild(t);
+				if (d.desc) {
+					const p = document.createElement("div");
+					p.className = "lp-desc";
+					p.textContent = d.desc;
+					tip.appendChild(p);
+				}
+				const host = document.createElement("div");
+				host.className = "lp-host";
+				host.textContent = new URL(d.url).hostname;
+				tip.appendChild(host);
+				tip.style.display = "block";
+				const r = a.getBoundingClientRect();
+				tip.style.left = Math.max(4, Math.min(r.left, window.innerWidth - 280)) + "px";
+				tip.style.top = Math.min(r.bottom + 8, window.innerHeight - 140) + "px";
+			};
+
+			document.addEventListener("mouseover", (e) => {
+				const a = e.target.closest("a[href]");
+				if (!a || a === active) return;
+				hide();
+				const href = a.href;
+				if (!href || !/^https?:/i.test(href) || href.includes(location.hostname)) return;
+				active = a;
+				timer = setTimeout(async () => {
+					if (active !== a) return;
+					let data = cache.get(href);
+					if (data === undefined) {
+						try {
+							const r = await fetch(PREVIEW_API + encodeURIComponent(href));
+							const j = await r.json();
+							data = j.error ? null : j;
+						} catch {
+							data = null;
+						}
+						cache.set(href, data);
+					}
+					if (!data || active !== a) return;
+					show(a, data);
+				}, 350);
+			});
+
+			document.addEventListener("mouseout", (e) => {
+				if (e.target.closest("a[href]")) hide();
+			});
+			window.addEventListener("scroll", hide);
+
+			makeTip();
+		</script>
 	</body>
 </html>
