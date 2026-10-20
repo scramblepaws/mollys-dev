@@ -78,10 +78,6 @@ const year = new Date().getFullYear();
 
 			<aside class="side side-right">
 				<div class="side-group">
-					<div class="side-title">stats</div>
-					<p>visitor no. <span class="counter">0000000</span></p>
-				</div>
-				<div class="side-group">
 					<div class="side-title">badges</div>
 					<div class="badges-row">
 						<img class="badge-gif" src="/badges/hpvc-now.gif" width="88" height="31" alt="hosted on a very cool server" loading="lazy" />
@@ -126,32 +122,5 @@ const year = new Date().getFullYear();
 			<div class="dots"></div>
 			<p>this page is handmade. no frameworks were harmed. (ok, one framework)</p>
 		</footer>
-
-		<script>
-			const COUNTER_URL = "https://PLACEHOLDER.workers.dev/hit";
-			const KEY = "molly_counter";
-			const DAY = 86400000;
-			const els = document.querySelectorAll(".counter");
-			const show = (n) =>
-				els.forEach((el) => (el.textContent = String(n).padStart(7, "0")));
-
-			try {
-				const saved = JSON.parse(localStorage.getItem(KEY) || "null");
-				if (saved && saved.value && Date.now() - saved.ts < DAY) {
-					show(saved.value);
-				} else {
-					fetch(COUNTER_URL + "?d=mollys.dev", { method: "POST" })
-						.then((r) => r.text())
-						.then((n) => {
-							const v = parseInt(n, 10);
-							localStorage.setItem(KEY, JSON.stringify({ ts: Date.now(), value: v }));
-							show(v);
-						})
-						.catch(() => show("???????"));
-				}
-			} catch {
-				show("???????");
-			}
-		</script>
 	</body>
 </html>

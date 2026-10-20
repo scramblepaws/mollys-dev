@@ -72,7 +72,87 @@ import { site } from "../data/site";
 			</li>
 		</ul>
 	</section>
+
+	<section class="box" id="guestbook">
+		<div class="lbl">guestbook &gt;&gt;</div>
+		<form class="gb-form" id="gb-form">
+			<input type="text" id="gb-name" maxlength="40" placeholder="name (optional)" />
+			<input class="gb-msg" type="text" id="gb-msg" maxlength="500" placeholder="leave a message..." required />
+			<button class="btn" type="submit">[ sign ]</button>
+		</form>
+		<div id="gb-list">
+			<p>loading guestbook...</p>
+		</div>
+	</section>
 </Layout>
+
+<script>
+	const GB_URL = "https://molly-counter.femfus.workers.dev";
+	const listEl = document.getElementById("gb-list");
+	const form = document.getElementById("gb-form");
+	const nameEl = document.getElementById("gb-name");
+	const msgEl = document.getElementById("gb-msg");
+
+	const el = (tag, cls, children, text) => {
+		const node = document.createElement(tag);
+		if (cls) node.className = cls;
+		if (children) for (const c of children) node.appendChild(c);
+		if (text) node.textContent = text;
+		return node;
+	};
+
+	const render = (entries) => {
+		if (!entries.length) {
+			listEl.replaceChildren(el("p", null, null, "no entries yet. be the first!"));
+			return;
+		}
+		listEl.replaceChildren(
+			...entries.map((e) => {
+				const meta = el("div", "gb-meta");
+				meta.appendChild(el("b", null, null, e.name));
+				meta.appendChild(document.createTextNode(" — " + new Date(e.ts).toISOString().slice(0, 10)));
+				const body = el("p", null, null, e.msg);
+				return el("div", "gb-entry", [meta, body]);
+			})
+		);
+	};
+
+	const load = async () => {
+		try {
+			const r = await fetch(GB_URL + "/list");
+			render(await r.json());
+		} catch {
+			listEl.replaceChildren(el("p", null, null, "guestbook offline :("));
+		}
+	};
+
+	form.addEventListener("submit", async (e) => {
+		e.preventDefault();
+		const msg = msgEl.value.trim();
+		if (!msg) return;
+		const btn = form.querySelector("button");
+		btn.textContent = "[ ... ]";
+		try {
+			const r = await fetch(GB_URL + "/post", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ name: nameEl.value.trim() || "anon", msg }),
+			});
+			const j = await r.json();
+			if (j.ok) {
+				msgEl.value = "";
+				load();
+			} else {
+				btn.textContent = "[ " + (j.error || "nope") + " ]";
+			}
+		} catch {
+			btn.textContent = "[ offline ]";
+		}
+		setTimeout(() => (btn.textContent = "[ sign ]"), 2000);
+	});
+
+	load();
+</script>
 
 <script>
 	document.querySelectorAll("[data-copy]").forEach((btn) => {

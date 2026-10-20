@@ -391,6 +391,42 @@ code {
 	padding: 16px 8px 24px;
 }
 
+/* --- guestbook --- */
+
+.gb-form {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+	margin-bottom: 8px;
+}
+
+.gb-form input[type="text"] {
+	background: var(--bg);
+	border: 1px solid var(--border);
+	color: var(--text);
+	font: 12px "Courier New", Courier, monospace;
+	padding: 2px 6px;
+	min-width: 0;
+}
+
+.gb-form .gb-msg {
+	flex: 1 1 160px;
+}
+
+.gb-entry {
+	border-bottom: 1px dotted var(--border);
+	padding: 6px 0;
+}
+
+.gb-meta {
+	font-size: 11px;
+	color: var(--dim);
+}
+
+.gb-entry p {
+	margin: 2px 0 0;
+}
+
 /* --- blog --- */
 
 .post-list {
