@@ -1,0 +1,7 @@
+name = "molly-counter"
+main = "src/index.js"
+compatibility_date = "2025-10-20"
+
+[[kv_namespaces]]
+binding = "COUNTS"
+id = "cd89535cfae54cdeb1587cdaea111a09"
