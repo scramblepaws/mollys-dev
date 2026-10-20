@@ -205,7 +205,7 @@ code {
 .lbl {
 	display: inline-block;
 	background: var(--accent);
-	color: var(--inverted);
+	color: #ffffff;
 	font-weight: bold;
 	font-size: 12px;
 	letter-spacing: 1px;
