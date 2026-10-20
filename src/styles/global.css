@@ -68,10 +68,9 @@ code {
 
 .logo {
 	display: block;
-	font-size: 30px;
-	font-weight: bold;
-	letter-spacing: 3px;
-	color: var(--accent-bright);
+	width: min(400px, 60vw);
+	height: auto;
+	image-rendering: auto;
 }
 
 .hello {
