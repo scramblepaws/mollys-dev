@@ -293,9 +293,19 @@ code {
 }
 
 .badge-gif {
-	display: block;
-	margin: 4px auto;
+	width: calc(50% - 2px);
+	height: auto;
 	image-rendering: pixelated;
+}
+
+.badges-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	justify-content: center;
+	border: 1px solid var(--border);
+	background: var(--panel);
+	padding: 6px;
 }
 
 .counter {
