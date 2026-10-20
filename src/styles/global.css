@@ -424,6 +424,25 @@ code {
 	border: 1px solid var(--border);
 }
 
+/* --- decorative --- */
+
+.anime-girl {
+	position: fixed;
+	right: 0;
+	bottom: 0;
+	width: 200px;
+	height: auto;
+	z-index: 0;
+	pointer-events: none;
+	transform: rotate(-4deg);
+}
+
+@media (max-width: 1500px) {
+	.anime-girl {
+		display: none;
+	}
+}
+
 /* --- responsive --- */
 
 @media (max-width: 900px) {
