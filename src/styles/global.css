@@ -292,6 +292,12 @@ code {
 	color: var(--accent-bright);
 }
 
+.badge-gif {
+	display: block;
+	margin: 4px auto;
+	image-rendering: pixelated;
+}
+
 .counter {
 	display: inline-block;
 	background: #05030c;
