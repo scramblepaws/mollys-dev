@@ -176,6 +176,12 @@ code {
 	padding: 6px;
 }
 
+.updates-badge {
+	display: block;
+	margin: 0 auto;
+	max-width: 100%;
+}
+
 /* --- main content --- */
 
 .box {
