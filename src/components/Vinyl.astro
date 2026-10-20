@@ -2,11 +2,8 @@
 ---
 
 <div class="player" id="player">
-	<div class="vinyl" id="vinyl">
-		<div class="label">
-			<img id="np-art" class="np-art" src="" alt="" />
-		</div>
-		<div class="hole"></div>
+	<div class="art-box">
+		<img id="np-art" class="np-art" src="" alt="" />
 	</div>
 	<div class="track-info">
 		<div class="track-title" id="track-title">checking what molly is listening to...</div>
@@ -19,7 +16,6 @@
 <script>
 	const NP_URL = "https://molly-counter.femfus.workers.dev/now-playing";
 
-	const vinyl = document.getElementById("vinyl");
 	const art = document.getElementById("np-art");
 	const titleEl = document.getElementById("track-title");
 	const fill = document.getElementById("progress-fill");
@@ -39,7 +35,6 @@
 		titleEl.textContent = data.playing
 			? "molly is listening to: " + data.title + (data.artist ? " — " + data.artist : "")
 			: "molly isn't listening to anything rn";
-		vinyl.style.animationPlayState = data.playing ? "running" : "paused";
 		if (data.playing && data.art) {
 			art.src = data.art;
 			art.style.display = "";
@@ -90,51 +85,20 @@
 		padding: 2px 0;
 	}
 
-	.vinyl {
-		position: relative;
-		display: grid;
-		place-items: center;
+	.art-box {
 		width: 100px;
-		aspect-ratio: 1;
-		border-radius: 50%;
-		background:
-			radial-gradient(circle at 50% 50%, #000 0 11%, transparent 11.5%),
-			repeating-radial-gradient(circle at 50% 50%, #101010 0 1px, #1e1a1a 1px 3px);
-		border: 1px solid #000;
-		box-shadow: 0 0 10px rgba(183, 148, 246, 0.3);
-		animation: spin 6s linear infinite;
-		animation-play-state: paused;
-	}
-
-	.label {
-		position: absolute;
-		inset: 0;
-		margin: auto;
-		width: 34%;
-		aspect-ratio: 1;
-		border-radius: 50%;
+		height: 100px;
+		border: 1px dotted var(--border, #6d4fb5);
+		background: var(--bg, #0b0716);
 		display: grid;
 		place-items: center;
-		overflow: hidden;
-		background: var(--accent, #b794f6);
 	}
 
 	.np-art {
 		width: 100%;
-		aspect-ratio: 1;
-		border-radius: 50%;
+		height: 100%;
+		object-fit: cover;
 		display: block;
-	}
-
-	.hole {
-		position: absolute;
-		inset: 0;
-		margin: auto;
-		width: 4%;
-		aspect-ratio: 1;
-		border-radius: 50%;
-		background: var(--bg, #0b0716);
-		z-index: 2;
 	}
 
 	.track-info {
@@ -173,11 +137,5 @@
 		text-align: center;
 		color: var(--dim, #a896c9);
 		letter-spacing: 1px;
-	}
-
-	@keyframes spin {
-		to {
-			transform: rotate(360deg);
-		}
 	}
 </style>
