@@ -26,9 +26,11 @@ import { site } from "../data/site";
 					{site.imageboards.map((b, i) => (
 						<>
 							{i > 0 && " · "}
-							<a class="icon-link" href={b.url}>
-								<Icon name="arrow" size={10} />
-								{b.name}
+							<a class="icon-link" href={b.url} title={b.name}>
+								{b.icon ? <Icon name={b.icon} size={14} /> : (<>
+									<Icon name="arrow" size={10} />
+									{b.name}
+								</>)}
 							</a>
 						</>
 					))}

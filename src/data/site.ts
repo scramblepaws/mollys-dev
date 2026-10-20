@@ -22,7 +22,7 @@ export const site = {
 		{ name: "osu! (cilaFO)", profile: "https://osu.ppy.sh/u/cilaFO" },
 		{ name: "Lucid Cats", profile: "https://store.steampowered.com/app/4778540/" },
 	],
-	imageboards: [{ name: "board #1", url: "https://example.com/" }],
+	imageboards: [{ name: "4chan", url: "https://www.4chan.org/", icon: "fourchan" }],
 	cheatLinks: [
 		{ name: "github", url: "https://github.com/scramblepaws" },
 		{ name: "spiff", url: "https://github.com/scramblepaws/spiff" },
