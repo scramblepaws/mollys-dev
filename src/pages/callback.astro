@@ -1,5 +1,6 @@
 ---
 import { site } from "../data/site";
+const clientId = JSON.stringify(site.spotifyClientId);
 ---
 
 <html lang="en">
@@ -17,11 +18,10 @@ import { site } from "../data/site";
 			}
 		</style>
 	</head>
-	<body>
+	<body data-cid={clientId}>
 		<p id="msg">connecting…</p>
-		<script type="application/json" id="sp-config">{JSON.stringify({ clientId: site.spotifyClientId })}</script>
 		<script>
-			const CLIENT_ID = JSON.parse(document.getElementById("sp-config").textContent).clientId;
+			const CLIENT_ID = document.body.dataset.cid;
 			const msg = document.getElementById("msg");
 
 			const code = new URLSearchParams(location.search).get("code");

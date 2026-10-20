@@ -1,8 +1,9 @@
 ---
 import { site } from "../data/site";
+const spotifyConfig = JSON.stringify({ clientId: site.spotifyClientId, playlistId: site.spotifyPlaylistId });
 ---
 
-<div class="player" id="player">
+<div class="player" id="player" data-sp={spotifyConfig}>
 	<div class="vinyl" id="vinyl">
 		<div class="label"><span>mollys.dev</span></div>
 		<div class="hole"></div>
@@ -22,10 +23,8 @@ import { site } from "../data/site";
 
 <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
-<script type="application/json" id="sp-config">{JSON.stringify({ clientId: site.spotifyClientId, playlistId: site.spotifyPlaylistId })}</script>
-
 <script>
-	const spConfig = JSON.parse(document.getElementById("sp-config").textContent);
+	const spConfig = JSON.parse(document.getElementById("player").dataset.sp);
 	const CLIENT_ID = spConfig.clientId;
 	const PLAYLIST_ID = spConfig.playlistId;
 	const REDIRECT = location.origin + "/callback";
