@@ -2,6 +2,7 @@
 let memCache = new Map();
 
 const SPOTIFY_CLIENT_ID = "b240a3e433a34fd3b2e7b406c585c510";
+const SPOTIFY_REDIRECT = "https://mollys.dev/callback";
 
 export default {
 	async fetch(req, env) {
@@ -59,13 +60,12 @@ export default {
 		}
 
 		if (req.method === "GET" && url.pathname === "/login") {
-			const redirect = "https://" + new URL(req.url).host + "/callback";
 			const authUrl =
 				"https://accounts.spotify.com/authorize?" +
 				new URLSearchParams({
 					client_id: SPOTIFY_CLIENT_ID,
 					response_type: "code",
-					redirect_uri: redirect,
+					redirect_uri: SPOTIFY_REDIRECT,
 					scope: "user-read-currently-playing user-read-playback-state",
 					state: "molly",
 				});
@@ -74,7 +74,6 @@ export default {
 
 		if (req.method === "GET" && url.pathname === "/callback") {
 			const code = url.searchParams.get("code");
-			const redirect = "https://" + new URL(req.url).host + "/callback";
 			if (!code) {
 				return new Response("no code :(", { status: 400 });
 			}
@@ -84,7 +83,7 @@ export default {
 				body: new URLSearchParams({
 					grant_type: "authorization_code",
 					code,
-					redirect_uri: redirect,
+					redirect_uri: SPOTIFY_REDIRECT,
 					client_id: SPOTIFY_CLIENT_ID,
 				}),
 			});

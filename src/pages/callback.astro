@@ -1,0 +1,29 @@
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>linking spotify…</title>
+		<style>
+			body {
+				background: #0b0716;
+				color: #e6ddff;
+				font-family: "Courier New", Courier, monospace;
+				display: grid;
+				place-items: center;
+				height: 100vh;
+			}
+		</style>
+	</head>
+	<body>
+		<p>linking spotify…</p>
+		<script>
+			const code = new URLSearchParams(location.search).get("code");
+			if (!code) {
+				document.querySelector("p").textContent = "missing code :( start over from /login";
+			} else {
+				location.replace(
+					"https://molly-counter.femfus.workers.dev/callback?code=" + encodeURIComponent(code)
+				);
+			}
+		</script>
+	</body>
+</html>
