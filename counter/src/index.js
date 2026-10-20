@@ -4,6 +4,12 @@ let memCache = new Map();
 const SPOTIFY_CLIENT_ID = "b240a3e433a34fd3b2e7b406c585c510";
 const SPOTIFY_REDIRECT = "https://mollys.dev/callback";
 
+const b64url = (buf) =>
+	btoa(String.fromCharCode(...new Uint8Array(buf)))
+		.replace(/\+/g, "-")
+		.replace(/\//g, "_")
+		.replace(/=+$/, "");
+
 export default {
 	async fetch(req, env) {
 		const url = new URL(req.url);
@@ -60,6 +66,11 @@ export default {
 		}
 
 		if (req.method === "GET" && url.pathname === "/login") {
+			const verifier = b64url(crypto.getRandomValues(new Uint8Array(64)));
+			const challenge = b64url(
+				await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier))
+			);
+			await env.COUNTS.put("sp_verifier", verifier, { expirationTtl: 600 });
 			const authUrl =
 				"https://accounts.spotify.com/authorize?" +
 				new URLSearchParams({
@@ -68,14 +79,17 @@ export default {
 					redirect_uri: SPOTIFY_REDIRECT,
 					scope: "user-read-currently-playing user-read-playback-state",
 					state: "molly",
+					code_challenge_method: "S256",
+					code_challenge: challenge,
 				});
 			return Response.redirect(authUrl, 302);
 		}
 
 		if (req.method === "GET" && url.pathname === "/callback") {
 			const code = url.searchParams.get("code");
-			if (!code) {
-				return new Response("no code :(", { status: 400 });
+			const verifier = await env.COUNTS.get("sp_verifier");
+			if (!code || !verifier) {
+				return new Response("no code or verifier :( start over from /login", { status: 400 });
 			}
 			const r = await fetch("https://accounts.spotify.com/api/token", {
 				method: "POST",
@@ -85,8 +99,10 @@ export default {
 					code,
 					redirect_uri: SPOTIFY_REDIRECT,
 					client_id: SPOTIFY_CLIENT_ID,
+					code_verifier: verifier,
 				}),
 			});
+			await env.COUNTS.delete("sp_verifier");
 			const j = await r.json();
 			if (!j.refresh_token) {
 				return new Response("auth failed: " + JSON.stringify(j), { status: 400 });
