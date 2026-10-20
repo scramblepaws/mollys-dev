@@ -223,6 +223,61 @@ code {
 	margin: 12px 0;
 }
 
+/* --- interests --- */
+
+.int-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 6px;
+	margin-top: 6px;
+}
+
+.int-block {
+	border: 1px dotted var(--border);
+	background: var(--panel);
+	padding: 6px 8px;
+}
+
+.int-block.full {
+	grid-column: 1 / -1;
+}
+
+.int-block p {
+	margin: 0;
+}
+
+.int-label {
+	font-size: 10px;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	color: var(--dim);
+	margin-bottom: 4px;
+}
+
+.chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	border: 1px solid var(--border);
+	background: var(--bg);
+	padding: 1px 6px;
+	margin: 2px 4px 2px 0;
+	font-size: 12px;
+	white-space: nowrap;
+}
+
+.chip:hover {
+	background: var(--accent);
+	color: var(--inverted);
+	text-decoration: none;
+}
+
+@media (max-width: 700px) {
+	.int-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
 /* --- icons --- */
 
 .icon {

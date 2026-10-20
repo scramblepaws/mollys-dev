@@ -19,45 +19,39 @@ import { site } from "../data/site";
 
 	<section class="box" id="interests">
 		<div class="lbl">interests &gt;&gt;</div>
-		<ul>
-			<li>
-				<b>imageboards</b> — i browse{" "}
-				{site.imageboards.map((b, i) => (
-					<>
-						<a class="icon-link" href={b.url}>
-							<Icon name="arrow" size={11} />
-							{b.name}
-						</a>
-						{i < site.imageboards.length - 1 ? ", " : ""}
-					</>
+		<div class="int-grid">
+			<div class="int-block">
+				<div class="int-label">imageboards</div>
+				{site.imageboards.map((b) => (
+					<a class="chip icon-link" href={b.url}>
+						<Icon name="arrow" size={10} />
+						{b.name}
+					</a>
 				))}
-			</li>
-			<li>
-				<b>cheat dev / jailbreaking / rooting</b> —{" "}
-				{site.cheatLinks.map((c, i) => (
-					<>
-						<a class="icon-link" href={c.url}>
-							<Icon name="arrow" size={11} />
-							{c.name}
-						</a>
-						{i < site.cheatLinks.length - 1 ? ", " : ""}
-					</>
+			</div>
+			<div class="int-block">
+				<div class="int-label">cheat dev / jailbreaking / rooting</div>
+				{site.cheatLinks.map((c) => (
+					<a class="chip icon-link" href={c.url}>
+						<Icon name="arrow" size={10} />
+						{c.name}
+					</a>
 				))}
-			</li>
-			<li>
-				<b>rhythm games</b> —{" "}
-				{site.rhythmGames.map((g, i) => (
-					<>
-						<a class="icon-link" href={g.profile}>
-							<Icon name="arrow" size={11} />
-							{g.name}
-						</a>
-						{i < site.rhythmGames.length - 1 ? ", " : ""}
-					</>
+			</div>
+			<div class="int-block">
+				<div class="int-label">rhythm games</div>
+				{site.rhythmGames.map((g) => (
+					<a class="chip icon-link" href={g.profile}>
+						<Icon name="arrow" size={10} />
+						{g.name}
+					</a>
 				))}
-			</li>
-			<li>{site.diyHrt}</li>
-		</ul>
+			</div>
+			<div class="int-block full">
+				<div class="int-label">DIY HRT</div>
+				<p>{site.diyHrt}</p>
+			</div>
+		</div>
 	</section>
 
 	<section class="box" id="contact">
