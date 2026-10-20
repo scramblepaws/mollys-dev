@@ -1,8 +1,6 @@
 export const site = {
 	name: "molly",
 	pronouns: "she/her",
-	spotifyClientId: "b240a3e433a34fd3b2e7b406c585c510",
-	spotifyPlaylistId: "5MtOaKlvceUtK10w7RnW2o",
 	tagline:
 		"trans woman // imageboard lurker // cheat dev (roblox / cs2 / tf2) // reverse engineer // osu! enjoyer",
 	blurb:

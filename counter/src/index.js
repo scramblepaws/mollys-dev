@@ -1,6 +1,8 @@
 // isolate-level cache: survives across requests that share the same worker instance
 let memCache = new Map();
 
+const SPOTIFY_CLIENT_ID = "b240a3e433a34fd3b2e7b406c585c510";
+
 export default {
 	async fetch(req, env) {
 		const url = new URL(req.url);
@@ -54,6 +56,103 @@ export default {
 			const entry = { name, msg, ts: now };
 			await env.COUNTS.put(key, JSON.stringify(entry));
 			return Response.json({ ok: true, entry }, { headers: cors });
+		}
+
+		if (req.method === "GET" && url.pathname === "/login") {
+			const redirect = "https://" + new URL(req.url).host + "/callback";
+			const authUrl =
+				"https://accounts.spotify.com/authorize?" +
+				new URLSearchParams({
+					client_id: SPOTIFY_CLIENT_ID,
+					response_type: "code",
+					redirect_uri: redirect,
+					scope: "user-read-currently-playing user-read-playback-state",
+					state: "molly",
+				});
+			return Response.redirect(authUrl, 302);
+		}
+
+		if (req.method === "GET" && url.pathname === "/callback") {
+			const code = url.searchParams.get("code");
+			const redirect = "https://" + new URL(req.url).host + "/callback";
+			if (!code) {
+				return new Response("no code :(", { status: 400 });
+			}
+			const r = await fetch("https://accounts.spotify.com/api/token", {
+				method: "POST",
+				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				body: new URLSearchParams({
+					grant_type: "authorization_code",
+					code,
+					redirect_uri: redirect,
+					client_id: SPOTIFY_CLIENT_ID,
+				}),
+			});
+			const j = await r.json();
+			if (!j.refresh_token) {
+				return new Response("auth failed: " + JSON.stringify(j), { status: 400 });
+			}
+			await env.COUNTS.put("sp_ref", j.refresh_token);
+			return new Response(
+				"saved! you can close this tab. mollys.dev now shows what you're listening to.",
+				{ headers: { "Content-Type": "text/plain; charset=utf-8" } }
+			);
+		}
+
+		if (req.method === "GET" && url.pathname === "/now-playing") {
+			const refresh = await env.COUNTS.get("sp_ref");
+			if (!refresh) return Response.json({ error: "not authed" }, { headers: cors });
+
+			let access = await env.COUNTS.get("sp_acc");
+			if (!access) {
+				const r = await fetch("https://accounts.spotify.com/api/token", {
+					method: "POST",
+					headers: { "Content-Type": "application/x-www-form-urlencoded" },
+					body: new URLSearchParams({
+						grant_type: "refresh_token",
+						refresh_token: refresh,
+						client_id: SPOTIFY_CLIENT_ID,
+					}),
+				});
+				const j = await r.json();
+				if (!j.access_token) {
+					return Response.json({ error: "refresh failed: " + (j.error || "?") }, { headers: cors });
+				}
+				access = j.access_token;
+				await env.COUNTS.put("sp_acc", access, {
+					expirationTtl: Math.max(60, (j.expires_in || 3600) - 60),
+				});
+			}
+
+			const np = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
+				headers: { Authorization: "Bearer " + access },
+			});
+			if (np.status === 204) return Response.json({ playing: false }, { headers: cors });
+			if (!np.ok) {
+				await env.COUNTS.delete("sp_acc");
+				return Response.json({ playing: false, error: "spotify " + np.status }, { headers: cors });
+			}
+			const body = await np.json();
+			const item = body.item;
+			if (!item) return Response.json({ playing: false }, { headers: cors });
+			const art =
+				item.album && item.album.images && item.album.images[1] ? item.album.images[1].url : null;
+			const artist = item.artists
+				? item.artists.map((a) => a.name).join(", ")
+				: item.show
+					? item.show.name
+					: "";
+			return Response.json(
+				{
+					playing: body.is_playing !== false,
+					title: item.name,
+					artist,
+					art,
+					progress: body.progress_ms || 0,
+					duration: item.duration_ms || 0,
+				},
+				{ headers: cors }
+			);
 		}
 
 		if (req.method === "GET" && url.pathname === "/preview") {
