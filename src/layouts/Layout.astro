@@ -23,16 +23,17 @@ const year = new Date().getFullYear();
 		<title>{title}</title>
 	</head>
 	<body>
-		<header class="top">
-			<div class="brand">
-				<img class="logo" src="/mollys-dev.png" width="400" height="133" alt="mollys.dev" />
-			</div>
-			<div class="announce" aria-hidden="true">
-				<div class="announce-inner">
-					<span>{marqueeText}</span><span>{marqueeText}</span>
+		<div class="page">
+			<header class="top">
+				<div class="brand">
+					<img class="logo" src="/mollys-dev.png" width="400" height="133" alt="mollys.dev" />
 				</div>
-			</div>
-		</header>
+				<div class="announce" aria-hidden="true">
+					<div class="announce-inner">
+						<span>{marqueeText}</span><span>{marqueeText}</span>
+					</div>
+				</div>
+			</header>
 
 		<div class="cols">
 			<aside class="side side-left">
@@ -112,13 +113,13 @@ const year = new Date().getFullYear();
 					<div class="side-title">updates</div>
 					<p><span class="blink">■</span> under construction</p>
 				</div>
-				<div class="side-group">
-					<div class="side-title">art</div>
-					<div class="pixel-art">
-						<div class="pixel-heart" aria-hidden="true"></div>
-					</div>
-				</div>
 			</aside>
+		</div>
+
+		<footer class="site-foot">
+			<div class="dots"></div>
+			<p>this page is handmade. no frameworks were harmed. (ok, one framework)</p>
+		</footer>
 		</div>
 
 		<img
@@ -129,11 +130,6 @@ const year = new Date().getFullYear();
 			alt=""
 			aria-hidden="true"
 		/>
-
-		<footer class="site-foot">
-			<div class="dots"></div>
-			<p>this page is handmade. no frameworks were harmed. (ok, one framework)</p>
-		</footer>
 
 		<script>
 			document.querySelectorAll("[data-copy]").forEach((btn) => {
