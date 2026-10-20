@@ -46,9 +46,14 @@ const clientId = JSON.stringify(site.spotifyClientId);
 					}),
 				})
 					.then((r) => r.json())
-					.then((j) => {
-						if (!j.access_token) throw new Error(j.error || "token exchange failed");
-						localStorage.setItem("sp_tok", j.access_token);
+				.then((j) => {
+					if (!j.access_token) {
+						throw new Error(
+							(j.error || "token exchange failed") +
+								(j.error_description ? ": " + j.error_description : "")
+						);
+					}
+					localStorage.setItem("sp_tok", j.access_token);
 						localStorage.setItem(
 							"sp_exp",
 							String(Date.now() + (j.expires_in - 60) * 1000)
