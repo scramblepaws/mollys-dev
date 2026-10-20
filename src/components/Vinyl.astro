@@ -9,7 +9,6 @@
 		<div class="track-title" id="track-title">checking what molly is listening to...</div>
 		<div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
 		<div class="times"><span id="time-cur">0:00</span><span id="time-dur">0:00</span></div>
-		<button class="btn" id="np-refresh">[ refresh ]</button>
 		<div class="np-note">read-only — molly controls the aux</div>
 	</div>
 </div>
@@ -78,7 +77,6 @@
 	document.addEventListener("visibilitychange", () => {
 		if (!document.hidden) poll();
 	});
-	document.getElementById("np-refresh").addEventListener("click", poll);
 </script>
 
 <style>
@@ -135,11 +133,6 @@
 		font-size: 9px;
 		color: var(--dim, #a896c9);
 		margin: 2px 0 4px;
-	}
-
-	#np-refresh {
-		display: block;
-		margin: 0 auto 4px;
 	}
 
 	.np-note {
